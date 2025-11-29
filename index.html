@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Magritte 3-Stem Player</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- Tone.js CDN -->
+    <script src="https://unpkg.com/tone/build/Tone.js"></script>
+  </head>
+  <body>
+    <div id="hud-labels" aria-label="mix labels">
+      <span id="label-beat" class="hud-label">BEAT</span>
+      <span id="label-vocal" class="hud-label">VOCAL</span>
+      <span id="label-chords" class="hud-label">CHORDS</span>
+    </div>
+
+    <div
+      id="progress"
+      role="progressbar"
+      aria-label="Playback Progress"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+    >
+      <div class="progress-fill"></div>
+    </div>
+
+    <span id="np-title" class="np-text" aria-label="Song title"></span>
+    <span id="np-artist" class="np-text" aria-label="Artist"></span>
+
+    <section id="visual">
+      <canvas id="stage"></canvas>
+    </section>
+
+    <!-- 처음 오디오 언락 -->
+    <div id="audio-unlock">
+      <div class="card">
+        Click to unlock audio<br />
+        <small>or press any key</small>
+      </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+    <script type="module">
+      import * as Choir from './choir.js'; //choir.js에서 export한 모든 함수를 Choir라는 배열 안에 묶어서 쓰겠다.
+
+      window.CHOIR = Choir; // 다른 모듈이나 스크립트(ex. main.js)에서 접근 가능하도록 전역에 노출 (CHOIR라는 이름의 전역 변수를 선언한것. 그리고 그것이 Choir라는 것.)
+
+      // 네가 만들 스프라이트: 20프레임, 프레임 크기 400x400(투명 WebP)
+      Choir.init({
+        canvasId: 'stage',
+        frames: 20,
+        frameW: 786,
+        frameH: 1200,
+        drawH: 328,
+        sprites: [
+          { src: './visual_source/mouth.png', count: 1, phase: 0.0 },
+          { src: './visual_source/apple.png', count: 12, phase: 0.0 },
+          { src: './visual_source/pigeon.png', count: 12, phase: 0.0 },
+        ],
+        subdivision: 5, //✅ 비트 분할(1=4분, 2=8분, 4=16분...) (1굳, 5굳)
+        // main.js(Tone.Transport)에서 현재 시간/템포를 읽어 박자 위상 동기
+        transportGetter: () => ({
+          seconds: window.Tone?.Transport?.seconds ?? 0,
+          bpm: window.Tone?.Transport?.bpm?.value ?? 120,
+        }),
+      });
+    </script>
+  </body>
+</html>
+
+<!-- 이제부터 할 것: 5240x400짜리 webp 배경투명 스프라이트 만들기(만들고 html에 이름 업데이트), choir.js 작성 -->
